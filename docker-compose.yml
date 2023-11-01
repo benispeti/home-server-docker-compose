@@ -1,0 +1,159 @@
+---
+version: "3.8"
+services:
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    networks:
+      - home_network
+    ports: 
+      - 32400:32400
+      #- 1900:1900/udp
+      #- 5353:5353/udp
+      #- 8324:8324
+      #- 32410:32410/udp
+      #- 32412:32412/udp
+      #- 32413:32413/udp
+      #- 32414:32414/udp
+      #- 32469:32469
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+      - VERSION=docker
+      - PLEX_CLAIM= #optional
+    volumes:
+      - plex_data:/config
+      - ${PLEX_MOVIES_PATH}:/movies:ro
+      - ${PLEX_SERIES_PATH}:/series:ro
+      - ${PLEX_MUSIC_PATH}:/music:ro
+    restart: unless-stopped
+    #read_only: true
+    security_opt:  
+      - no-new-privileges
+    healthcheck:
+      test: "curl --connect-timeout 15 --silent --show-error --fail http://localhost:32400/identity || exit 1"
+      interval: 2m00s
+      timeout: 15s
+      retries: 3
+      start_period: 0m30s
+    labels:
+      - "traefik.enable=true"
+      # HTTP router
+      - "traefik.http.routers.plex_http.rule=Host(`plex.${DOMAIN}`)"
+      - "traefik.http.routers.plex_http.entrypoints=web"
+      - "traefik.http.routers.plex_http.middlewares=plex_https_redirect"
+      # HTTPS redirect rule
+      - "traefik.http.middlewares.plex_https_redirect.redirectscheme.scheme=https"
+      # HTTPS router
+      - "traefik.http.routers.plex_https.rule=Host(`plex.${DOMAIN}`)"
+      - "traefik.http.routers.plex_https.entrypoints=websecure"
+      # HTTP service
+      - "traefik.http.services.plex.loadbalancer.server.port=32400"
+    depends_on:
+      - traefik
+
+  homeassistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:2023.7
+    volumes:
+      - $PWD/home-assistant:/config:rw
+    restart: unless-stopped
+    privileged: true
+    networks:
+      - home_network
+    ports:
+      - 8123:8123
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+      - REVERSE_PROXY_IP=${TRAEFIK_IP}
+    #read_only: true
+    security_opt:  
+      - no-new-privileges
+    healthcheck:
+      test: "curl --connect-timeout 15 --silent --show-error --fail http://localhost:8123/ || exit 1"
+      interval: 2m00s
+      timeout: 15s
+      retries: 3
+      start_period: 0m30s
+    labels:
+      - "traefik.enable=true"
+      # HTTP rule
+      - "traefik.http.routers.homeassistant_http.rule=Host(`homeassistant.${DOMAIN}`)"
+      - "traefik.http.routers.homeassistant_http.entrypoints=web"
+      - "traefik.http.routers.homeassistant_http.middlewares=homeassistant_https_redirect"
+      # HTTPS redirect rule
+      - "traefik.http.middlewares.homeassistant_https_redirect.redirectscheme.scheme=https"
+      # HTTPS rule
+      - "traefik.http.routers.homeassistant_https.rule=Host(`homeassistant.${DOMAIN}`)"
+      - "traefik.http.routers.homeassistant_https.entrypoints=websecure"
+      # HTTP service
+      - "traefik.http.services.homeassistant.loadbalancer.server.port=8123"
+    depends_on:
+      - traefik
+
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    networks:
+      home_network:
+        ipv4_address: ${TRAEFIK_IP}
+    ports: 
+      - 8080:8080
+      - 8088:80
+      - 443:443
+    volumes:
+      - $PWD/traefik/traefik.yml:/etc/traefik/traefik.yml
+      - $PWD/traefik/dynamic.yml:/etc/traefik/dynamic.yml
+      - $PWD/cert/server.crt:/etc/traefik/certificates/traefik.crt
+      - $PWD/cert/server.key:/etc/traefik/certificates/traefik.key
+      - //var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=${TZ}
+    read_only: true
+    security_opt:
+      - no-new-privileges
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 2m00s
+      timeout: 15s
+      retries: 3
+      start_period: 1m00s
+    labels:
+      - "traefik.enable=true"
+      # HTTPS config
+      - "traefik.http.routers.dashboard_https.rule=Host(`traefik.${DOMAIN}`)"
+      - "traefik.http.routers.dashboard_https.entrypoints=websecure"
+      - "traefik.http.routers.dashboard_https.tls=true"
+      # - "traefik.http.routers.dashboard_https.tls.certResolver=letsencrypt"
+      - "traefik.http.routers.dashboard_https.service=api@internal"
+      - "traefik.http.routers.dashboard_https.middlewares=traefik-auth"
+
+      # - "traefik.http.services.noop.loadbalancer.server.port=888" # required only for swarm
+
+      # Basic auth config
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_USERS}"
+
+      # HTTP config
+      - "traefik.http.routers.dashboard_http.rule=Host(`traefik.${DOMAIN}`)"
+      - "traefik.http.routers.dashboard_http.entrypoints=web"
+      - "traefik.http.routers.dashboard_http.middlewares=dashboard_https_redirect"
+
+      # HTTPS redirect rule
+      - "traefik.http.middlewares.dashboard_https_redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.dashboard_https_redirect.redirectscheme.permanent=true"
+    restart: unless-stopped
+
+volumes:
+  plex_data:
+
+networks:
+  home_network:
+    name: home_network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${DOCKER_SUBNET}

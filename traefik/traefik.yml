@@ -1,0 +1,33 @@
+# Static configuration
+# traefik.yml
+
+global:
+  sendAnonymousUsage: true
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+    http:
+      tls: {}
+
+# Docker configuration backend
+providers:
+  docker:
+    defaultRule: "Host(`{{ trimPrefix `/` .Name }}.docker.localhost`)"
+    exposedByDefault: false
+    httpClientTimeout: 60
+  file: 
+    filename: "/etc/traefik/dynamic.yml"
+
+# Enable ping API handler:
+ping: {}
+
+# API and dashboard configuration
+api:
+  insecure: true
+  dashboard: true
+  
+log:
+  level: INFO

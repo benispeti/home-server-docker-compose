@@ -1,0 +1,13 @@
+# ignore environment file
+.env
+
+# ignore certificate files
+cert/*.key
+cert/*.crt
+
+# ignore traefik credentials
+traefik/credentials.txt
+
+# ignore homeassistant files
+home-assistant/*
+!home-assistant/configuration.yaml

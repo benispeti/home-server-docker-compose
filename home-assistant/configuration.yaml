@@ -1,0 +1,18 @@
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - !env_var REVERSE_PROXY_IP
+    - 127.0.0.1
+    - ::1
+  cors_allowed_origins:
+    - https://google.com
+    - https://www.home-assistant.io
+  ip_ban_enabled: true
+  login_attempts_threshold: 5
+    
+# Text to speech
+tts:
+  - platform: google_translate
