@@ -4,7 +4,7 @@
 # on the command line.
 
 # the fully qualified server (or service) name
-FQDN = home.bp.com
+FQDN = home.lan
 
 # the name of your organization
 # (see also https://www.switch.ch/pki/participants/)
@@ -14,7 +14,7 @@ ORGNAME = BP Home
 # the '#' character in the ALTNAMES line, and change the subsequent
 # 'DNS:' entries accordingly. Please note: all DNS names must
 # resolve to the same IP address as the FQDN.
-ALTNAMES = DNS:$FQDN, DNS:traefik.home.bp.com, DNS:plex.home.bp.com, DNS:homeassistant.home.bp.com, IP: 192.168.0.249
+ALTNAMES = DNS:$FQDN, DNS:traefik.home.lan, DNS:plex.home.lan, DNS:homeassistant.home.lan, IP: 192.168.0.100
 
 # --- no modifications required below ---
 [ req ]
