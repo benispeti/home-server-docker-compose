@@ -3,7 +3,6 @@
 
 # ignore certificate files
 cert/*.key
-cert/*.crt
 
 # ignore traefik credentials
 traefik/credentials.txt
