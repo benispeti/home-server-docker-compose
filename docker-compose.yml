@@ -33,10 +33,11 @@ services:
       - no-new-privileges
     healthcheck:
       test: "curl --connect-timeout 15 --silent --show-error --fail http://localhost:32400/identity || exit 1"
-      interval: 2m00s
-      timeout: 15s
+      interval: 30s
+      timeout: 5s
       retries: 3
-      start_period: 0m30s
+      start_period: 15s
+      start_interval: 5s
     labels:
       - "traefik.enable=true"
       # HTTP router
@@ -74,10 +75,11 @@ services:
       - no-new-privileges
     healthcheck:
       test: "curl --connect-timeout 15 --silent --show-error --fail http://localhost:8123/ || exit 1"
-      interval: 2m00s
-      timeout: 15s
+      interval: 30s
+      timeout: 5s
       retries: 3
-      start_period: 0m30s
+      start_period: 15s
+      start_interval: 5s
     labels:
       - "traefik.enable=true"
       # HTTP rule
@@ -117,10 +119,11 @@ services:
       - no-new-privileges
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping"]
-      interval: 2m00s
-      timeout: 15s
+      interval: 30s
+      timeout: 5s
       retries: 3
-      start_period: 1m00s
+      start_period: 15s
+      start_interval: 5s
     labels:
       - "traefik.enable=true"
       # HTTPS config
