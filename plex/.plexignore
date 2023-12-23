@@ -1,0 +1,5 @@
+# Ignore sample files
+**/sample/*
+**/Sample/*
+**/!sample.mkv
+**/sample.mkv
