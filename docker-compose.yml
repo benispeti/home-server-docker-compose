@@ -98,6 +98,49 @@ services:
     depends_on:
       - traefik
 
+  adguard:
+    image: adguard/adguardhome
+    container_name: adguard
+    networks:
+      home_network:
+        ipv4_address: ${ADGUARD_IP}
+    ports: 
+      - 3000:3000/tcp
+      - 8090:80/tcp
+      - 53:53/tcp
+      - 53:53/udp
+    volumes:
+      - $PWD/adguard/work:/opt/adguardhome/work
+      - $PWD/adguard/conf:/opt/adguardhome/conf
+    environment:
+      - TZ=${TZ}
+    read_only: true
+    security_opt:
+      - no-new-privileges
+  #  healthcheck:
+  #    test: ["CMD", "traefik", "healthcheck", "--ping"]
+  #    interval: 30s
+  #    timeout: 5s
+  #    retries: 3
+  #    start_period: 15s
+  #    start_interval: 5s
+    labels:
+      - "traefik.enable=true"
+      # HTTP rule
+      - "traefik.http.routers.adguard_http.rule=Host(`adguard.${DOMAIN}`)"
+      - "traefik.http.routers.adguard_http.entrypoints=web"
+      - "traefik.http.routers.adguard_http.middlewares=adguard_https_redirect"
+      # HTTPS redirect rule
+      - "traefik.http.middlewares.adguard_https_redirect.redirectscheme.scheme=https"
+      # HTTPS rule
+      - "traefik.http.routers.adguard_https.rule=Host(`adguard.${DOMAIN}`)"
+      - "traefik.http.routers.adguard_https.entrypoints=websecure"
+      # HTTP service
+      - "traefik.http.services.adguard.loadbalancer.server.port=8090"
+    restart: unless-stopped
+    depends_on:
+      - traefik
+
   traefik:
     image: traefik:v2.10
     container_name: traefik

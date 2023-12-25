@@ -14,7 +14,7 @@ ORGNAME = BP Home
 # the '#' character in the ALTNAMES line, and change the subsequent
 # 'DNS:' entries accordingly. Please note: all DNS names must
 # resolve to the same IP address as the FQDN.
-ALTNAMES = DNS:$FQDN, DNS:traefik.home.lan, DNS:plex.home.lan, DNS:homeassistant.home.lan, IP: 192.168.0.100
+ALTNAMES = DNS:$FQDN, DNS:traefik.home.lan, DNS:adguard.home.lan, DNS:plex.home.lan, DNS:homeassistant.home.lan, IP: 192.168.0.100
 
 # --- no modifications required below ---
 [ req ]
