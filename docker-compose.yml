@@ -25,9 +25,11 @@ services:
       - PLEX_CLAIM= #optional
     volumes:
       - plex_data:/config
-      - ${PLEX_MOVIES_PATH}:/movies:ro
-      - ${PLEX_SERIES_PATH}:/series:ro
-      - ${PLEX_MUSIC_PATH}:/music:ro
+      - $PWD/plex/.plexignore:/movies/.plexignore:ro
+      - ${PLEX_MOVIES_1_PATH}:/movies/1:ro
+      - ${PLEX_MOVIES_2_PATH}:/movies/2:ro
+      - ${PLEX_SERIES_1_PATH}:/series/1:ro
+      - ${PLEX_MUSIC_1_PATH}:/music/1:ro
     restart: unless-stopped
     #read_only: true
     security_opt:  
