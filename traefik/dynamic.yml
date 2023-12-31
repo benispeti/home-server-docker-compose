@@ -12,3 +12,18 @@ tls:
       keyFile: /etc/traefik/certificates/traefik.key
       stores:
         - default
+
+http:
+  routers:
+    shelly:
+      entryPoints:
+        - "websecure"
+      tls: true
+      rule: "Host(`shelly1l-3c6105e33577.home.lan`)"
+      service: shelly
+  services:
+    shelly:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.1.117"
+        passHostHeader: false

@@ -3,6 +3,17 @@
 
 global:
   sendAnonymousUsage: true
+  
+# Enable ping API handler:
+ping: {}
+
+# API and dashboard configuration
+api:
+  insecure: true
+  dashboard: true
+  
+log:
+  level: INFO
 
 entryPoints:
   web:
@@ -20,14 +31,3 @@ providers:
     httpClientTimeout: 60
   file: 
     filename: "/etc/traefik/dynamic.yml"
-
-# Enable ping API handler:
-ping: {}
-
-# API and dashboard configuration
-api:
-  insecure: true
-  dashboard: true
-  
-log:
-  level: INFO
