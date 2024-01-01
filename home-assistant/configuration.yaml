@@ -22,7 +22,19 @@ frontend:
   themes: !include_dir_merge_named themes
 
 panel_iframe:
+  traefik:
+    title: "Traefik"
+    url: !env_var TRAEFIK_URL
+    icon: mdi:router
+  adguard:
+    title: "AdGuard"
+    url: !env_var ADGUARD_URL
+    icon: mdi:advertisements-off
+  plex:
+    title: "Plex"
+    url: !env_var PLEX_URL
+    icon: mdi:plex
   shelly:
     title: "Shelly"
-    url: "https://shelly1l-3c6105e33577.home.lan/"
+    url: !env_var SHELLY_URL
     icon: mdi:electric-switch
