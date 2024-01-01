@@ -11,3 +11,6 @@ traefik/credentials.txt
 home-assistant/*
 !home-assistant/configuration.yaml
 !home-assistant/dashboard.yaml
+
+# ignore adguard files
+adguard/work/*
