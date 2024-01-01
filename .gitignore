@@ -10,3 +10,4 @@ traefik/credentials.txt
 # ignore homeassistant files
 home-assistant/*
 !home-assistant/configuration.yaml
+!home-assistant/dashboard.yaml

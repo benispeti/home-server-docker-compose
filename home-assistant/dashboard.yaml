@@ -1,0 +1,222 @@
+title: Home
+kiosk_mode:
+  user_settings:
+    - users:
+        - Kiosk User
+      hide_sidebar: true
+      hide_menubutton: true
+      hide_search: true
+      hide_overflow: true
+      block_context_menu: true
+views:
+  - title: Home
+    path: Home
+    type: custom:grid-layout
+    layout:
+      gridrows: auto
+      grid-template-columns: 20% 30% 30% 20%
+      grid-template-areas: |
+        "h1 h1 h1 h1"
+        "entities entities cast cast"
+        "lights lights doors doors"
+        "f1 f1 f1 f1"
+    icon: mdi:home-circle
+    theme: dark_teal
+    badges: []
+    cards:
+      - type: custom:digital-clock
+        firstLineFormat: HH:mm:ss
+        secondLineFormat: yyyy LLL dd
+        grid-template-columns: 50% 30% 20%
+        view_layout:
+          grid-area: h1
+      - type: custom:button-card
+        cards:
+          - type: custom:button-card
+            entity: light.tuya_wifi_led_strip_light_rgb_cct
+        view_layout:
+          grid-area: light
+      - type: media-control
+        entity: media_player.nappali
+        view_layout:
+          grid-area: cast
+      - square: true
+        type: grid
+        title: Lights
+        cards:
+          - type: light
+            entity: light.tuya_wifi_led_strip_light_rgb_cct
+            size: 100%
+          - type: custom:button-card
+            entity: switch.shelly1l_3c6105e33577
+            icon: mdi:lightbulb
+            name: Lépcső
+            size: 50%
+            show_state: true
+            styles:
+              card:
+                - height: 250px
+        columns: 2
+        view_layout:
+          grid-area: lights
+      - square: true
+        type: grid
+        title: Doors
+        cards:
+          - type: custom:button-card
+            entity: cover.smart_garage_door_opener_door
+            show_state: true
+            size: 80%
+            name: Garage door
+            state:
+              - color: green
+                icon: mdi:garage-variant
+                value: closed
+              - color: orange
+                icon: mdi:garage-open-variant
+                value: open
+            styles: null
+            tap_action:
+              action: call-service
+              service: cover.close_cover
+              service_data:
+                entity_id: cover.smart_garage_door_opener_door
+            double_tap_action:
+              action: call-service
+              service: cover.open_cover
+              service_data:
+                entity_id: cover.smart_garage_door_opener_door
+        columns: 2
+        view_layout:
+          grid-area: doors
+      - type: custom:mushroom-person-card
+        entity: device_tracker.sm_g990b2
+        icon: mdi:cellphone
+        name: Peti mobile
+        view_layout:
+          grid-area: entities
+  - title: Robot Porszivo
+    path: robot-porszivo
+    icon: mdi:robot-vacuum
+    theme: dark_teal
+    type: custom:grid-layout
+    badges: []
+    cards:
+      - type: custom:vacuum-card
+        entity: vacuum.viomi_v8_4072_robot_cleaner
+        stats:
+          default:
+            - entity_id: sensor.viomi_v8_4072_hypa_life
+              unit: '%'
+              subtitle: Hepa Filter
+            - entity_id: sensor.viomi_v8_4072_side_brush_life
+              unit: '%'
+              subtitle: Side brush
+            - entity_id: sensor.viomi_v8_4072_main_brush_life
+              unit: '%'
+              subtitle: Main brush
+            - attribute: sensor_dirty_left
+              unit: hours
+              subtitle: Sensors
+          cleaning:
+            - entity_id: sensor.vacuum_main_brush_left
+              value_template: '{{ (value | float(0) / 3600) | round(1) }}'
+              subtitle: Main brush
+              unit: hours
+            - attribute: stats.
+              unit: minutes
+              subtitle: Cleaning time
+        shortcuts:
+          - name: Clean living room
+            service: script.clean_living_room
+            icon: mdi:sofa
+          - name: Clean bedroom
+            service: script.clean_bedroom
+            icon: mdi:chef-hat
+          - name: Clean kitchen
+            service: script.clean_kitchen
+            icon: mdi:silverware-fork-knife
+          - name: Clean bathroom
+            service: script.clean_bathroom
+            icon: mdi:shower-head
+          - name: Clean corridor
+            service: script.clean_corridor
+            icon: mdi:door
+  - title: Weather
+    path: weather
+    icon: mdi:weather-partly-cloudy
+    type: custom:vertical-layout
+    theme: dark_teal
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:weather-radar-card
+            frame_count: 144
+            frame_delay: 100
+            show_marker: true
+            show_range: false
+            map_style: Voyager
+            marker_latitude: 47.36882972141746
+            marker_longitude: 18.876527085272624
+      - type: iframe
+        url: /local/idokep.html
+        aspect_ratio: 80%
+  - title: Aram
+    path: aram
+    type: custom:grid-layout
+    layout:
+      gridrows: auto
+      grid-template-columns: 66% 33%
+      grid-template-areas: |
+        "a a"
+        "c1 c2"
+        "c1 c3"
+    icon: mdi:lightning-bolt-circle
+    theme: dark_teal
+    badges: []
+    cards:
+      - type: picture
+        image: >-
+          https://docs.google.com/spreadsheets/d/e/2PACX-1vQt5cHm-KabJYN2msrc16e5vfURW3q8_rHpHAbQJf9sNUQrryRmpAJSqWWZnCSPZdnq6MRqnXBm2LPs/pubchart?oid=1564763450&format=image
+        view_layout:
+          grid-area: c1
+      - type: picture
+        image: >-
+          https://docs.google.com/spreadsheets/d/e/2PACX-1vQt5cHm-KabJYN2msrc16e5vfURW3q8_rHpHAbQJf9sNUQrryRmpAJSqWWZnCSPZdnq6MRqnXBm2LPs/pubchart?oid=1952843998&format=image
+        view_layout:
+          grid-area: c3
+      - type: picture
+        image: >-
+          https://docs.google.com/spreadsheets/d/e/2PACX-1vQt5cHm-KabJYN2msrc16e5vfURW3q8_rHpHAbQJf9sNUQrryRmpAJSqWWZnCSPZdnq6MRqnXBm2LPs/pubchart?oid=166921560&format=image
+        view_layout:
+          grid-area: c2
+  - title: Gaz
+    path: gaz
+    type: custom:grid-layout
+    layout:
+      gridrows: auto
+      grid-template-columns: 66% 33%
+      grid-template-areas: |
+        "g g"
+        "c1 c2"
+        "c1 c3"
+    icon: mdi:fire-circle
+    theme: dark_teal
+    badges: []
+    cards:
+      - type: picture
+        image: >-
+          https://docs.google.com/spreadsheets/d/e/2PACX-1vQt5cHm-KabJYN2msrc16e5vfURW3q8_rHpHAbQJf9sNUQrryRmpAJSqWWZnCSPZdnq6MRqnXBm2LPs/pubchart?oid=129051968&format=image
+        view_layout:
+          grid-area: c3
+      - type: picture
+        image: >-
+          https://docs.google.com/spreadsheets/d/e/2PACX-1vQt5cHm-KabJYN2msrc16e5vfURW3q8_rHpHAbQJf9sNUQrryRmpAJSqWWZnCSPZdnq6MRqnXBm2LPs/pubchart?oid=1351432639&format=image
+        view_layout:
+          grid-area: c2
+      - type: picture
+        image: >-
+          https://docs.google.com/spreadsheets/d/e/2PACX-1vQt5cHm-KabJYN2msrc16e5vfURW3q8_rHpHAbQJf9sNUQrryRmpAJSqWWZnCSPZdnq6MRqnXBm2LPs/pubchart?oid=831884763&format=image
+        view_layout:
+          grid-area: c1
