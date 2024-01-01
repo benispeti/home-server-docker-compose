@@ -165,6 +165,8 @@ services:
       - //var/run/docker.sock:/var/run/docker.sock
     environment:
       - TZ=${TZ}
+      - SHELLY_IP=${SHELLY_IP}
+      - SHELLY_DOMAIN=${SHELLY_DOMAIN}
     read_only: true
     security_opt:
       - no-new-privileges
