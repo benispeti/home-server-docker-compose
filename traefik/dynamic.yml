@@ -21,9 +21,20 @@ http:
       tls: true
       rule: "Host(`{{env "SHELLY_DOMAIN"}}`)"
       service: shelly
+    deluge:
+      entryPoints:
+        - "websecure"
+      tls: true
+      rule: "Host(`{{env "DELUGE_DOMAIN"}}`)"
+      service: deluge
   services:
     shelly:
       loadBalancer:
         servers:
           - url: "http://{{env "SHELLY_IP"}}"
         passHostHeader: false
+    deluge:
+      loadBalancer:
+        servers:
+          - url: "http://{{env "DELUGE_IP"}}"
+        passHostHeader: true

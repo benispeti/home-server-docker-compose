@@ -78,6 +78,7 @@ services:
       - ADGUARD_URL=${ADGUARD_URL}
       - SHELLY_URL=${SHELLY_URL}
       - PLEX_URL=${PLEX_URL}
+      - DELUGE_URL=${DELUGE_URL}
     #read_only: true
     security_opt:  
       - no-new-privileges
@@ -167,6 +168,8 @@ services:
       - TZ=${TZ}
       - SHELLY_IP=${SHELLY_IP}
       - SHELLY_DOMAIN=${SHELLY_DOMAIN}
+      - DELUGE_IP=${DELUGE_IP}
+      - DELUGE_DOMAIN=${DELUGE_DOMAIN}
     read_only: true
     security_opt:
       - no-new-privileges

@@ -27,6 +27,7 @@ req_extensions = req_ext
 [ dn ]
 C = CH
 O = $ORGNAME
+OU = Engineering
 CN = $FQDN
 
 [ req_ext ]
@@ -41,3 +42,4 @@ DNS.3 = adguard.home.lan
 DNS.4 = plex.home.lan
 DNS.5 = homeassistant.home.lan
 DNS.6 = shelly1l-3c6105e33577.home.lan
+DNS.7 = deluge.home.lan
