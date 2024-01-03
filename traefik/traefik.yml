@@ -31,3 +31,8 @@ providers:
     httpClientTimeout: 60
   file: 
     filename: "/etc/traefik/dynamic.yml"
+
+tracing:
+  jaeger:
+    samplingServerURL: http://jaeger:5778/sampling
+    localAgentHostPort: jaeger:6831
