@@ -47,12 +47,12 @@ services:
       # HTTP router
       - "traefik.http.routers.plex_http.rule=Host(`${PLEX_DOMAIN}`)"
       - "traefik.http.routers.plex_http.entrypoints=web"
-      - "traefik.http.routers.plex_http.middlewares=plex_https_redirect"
-      # HTTPS redirect rule
-      - "traefik.http.middlewares.plex_https_redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.plex_http.middlewares=https-redirect@file,additional-headers@file"
       # HTTPS router
       - "traefik.http.routers.plex_https.rule=Host(`${PLEX_DOMAIN}`)"
       - "traefik.http.routers.plex_https.entrypoints=websecure"
+      - "traefik.http.routers.plex_https.tls.options=modern@file"
+      - "traefik.http.routers.plex_https.middlewares=additional-headers@file"
       # HTTP service
       - "traefik.http.services.plex.loadbalancer.server.port=32400"
     depends_on:
@@ -95,12 +95,12 @@ services:
       # HTTP rule
       - "traefik.http.routers.homeassistant_http.rule=Host(`${HOMEASSISTANT_DOMAIN}`)"
       - "traefik.http.routers.homeassistant_http.entrypoints=web"
-      - "traefik.http.routers.homeassistant_http.middlewares=homeassistant_https_redirect"
-      # HTTPS redirect rule
-      - "traefik.http.middlewares.homeassistant_https_redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.homeassistant_http.middlewares=https-redirect@file,additional-headers@file"
       # HTTPS rule
       - "traefik.http.routers.homeassistant_https.rule=Host(`${HOMEASSISTANT_DOMAIN}`)"
       - "traefik.http.routers.homeassistant_https.entrypoints=websecure"
+      - "traefik.http.routers.homeassistant_https.tls.options=modern@file"
+      - "traefik.http.routers.homeassistant_https.middlewares=additional-headers@file"
       # HTTP service
       - "traefik.http.services.homeassistant.loadbalancer.server.port=8123"
     depends_on:
@@ -137,12 +137,12 @@ services:
       # HTTP rule
       - "traefik.http.routers.adguard_http.rule=Host(`${ADGUARD_DOMAIN}`)"
       - "traefik.http.routers.adguard_http.entrypoints=web"
-      - "traefik.http.routers.adguard_http.middlewares=adguard_https_redirect"
-      # HTTPS redirect rule
-      - "traefik.http.middlewares.adguard_https_redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.adguard_http.middlewares=https-redirect@file,additional-headers@file"
       # HTTPS rule
       - "traefik.http.routers.adguard_https.rule=Host(`${ADGUARD_DOMAIN}`)"
       - "traefik.http.routers.adguard_https.entrypoints=websecure"
+      - "traefik.http.routers.adguard_https.tls.options=modern@file"
+      - "traefik.http.routers.adguard_https.middlewares=additional-headers@file"
       # HTTP service
       - "traefik.http.services.adguard.loadbalancer.server.port=80"
     restart: unless-stopped
@@ -171,6 +171,7 @@ services:
       - SHELLY_DOMAIN=${SHELLY_DOMAIN}
       - DELUGE_IP=${DELUGE_IP}
       - DELUGE_DOMAIN=${DELUGE_DOMAIN}
+      - HOMEASSISTANT_DOMAIN=${HOMEASSISTANT_DOMAIN}
     read_only: true
     security_opt:
       - no-new-privileges
@@ -186,10 +187,10 @@ services:
       # HTTPS config
       - "traefik.http.routers.dashboard_https.rule=Host(`${TRAEFIK_DOMAIN}`)"
       - "traefik.http.routers.dashboard_https.entrypoints=websecure"
-      - "traefik.http.routers.dashboard_https.tls=true"
+      - "traefik.http.routers.dashboard_https.tls.options=modern@file"
       # - "traefik.http.routers.dashboard_https.tls.certResolver=letsencrypt"
       - "traefik.http.routers.dashboard_https.service=api@internal"
-      - "traefik.http.routers.dashboard_https.middlewares=traefik-auth"
+      - "traefik.http.routers.dashboard_https.middlewares=traefik-auth,additional-headers@file"
 
       # - "traefik.http.services.noop.loadbalancer.server.port=888" # required only for swarm
 
@@ -199,11 +200,7 @@ services:
       # HTTP config
       - "traefik.http.routers.dashboard_http.rule=Host(`${TRAEFIK_DOMAIN}`)"
       - "traefik.http.routers.dashboard_http.entrypoints=web"
-      - "traefik.http.routers.dashboard_http.middlewares=dashboard_https_redirect"
-
-      # HTTPS redirect rule
-      - "traefik.http.middlewares.dashboard_https_redirect.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.dashboard_https_redirect.redirectscheme.permanent=true"
+      - "traefik.http.routers.dashboard_http.middlewares=https-redirect@file,additional-headers@file"
     restart: unless-stopped
 
   jaeger:

@@ -12,6 +12,9 @@ tls:
       keyFile: /etc/traefik/certificates/traefik.key
       stores:
         - default
+  options:
+    modern:
+      minVersion: VersionTLS13
 
 http:
   routers:
@@ -21,12 +24,18 @@ http:
       tls: true
       rule: "Host(`{{env "SHELLY_DOMAIN"}}`)"
       service: shelly
+      middlewares:
+        - https-redirect@file
+        - additional-headers@file
     deluge:
       entryPoints:
         - "websecure"
       tls: true
       rule: "Host(`{{env "DELUGE_DOMAIN"}}`)"
       service: deluge
+      middlewares:
+        - https-redirect@file
+        - additional-headers@file
   services:
     shelly:
       loadBalancer:
@@ -38,3 +47,13 @@ http:
         servers:
           - url: "http://{{env "DELUGE_IP"}}"
         passHostHeader: true
+  middlewares:
+    additional-headers:
+      headers:
+        contentTypeNosniff: true
+        contentSecurityPolicy: frame-src {{env "HOMEASSISTANT_DOMAIN"}}
+        stsIncludeSubdomains: true
+        stsSeconds: 63072000
+    https-redirect:
+      redirectscheme:
+        scheme: https
