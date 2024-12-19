@@ -355,7 +355,7 @@ services:
       # HTTPS rule
       - "traefik.http.routers.portainer_https.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${PORTAINER_PATH}`))"
       - "traefik.http.routers.portainer_https.entrypoints=websecure"
-      - "traefik.http.routers.portainer_https.middlewares=stripprefix-portainer,csp-headers@file"
+      - "traefik.http.routers.portainer_https.middlewares=stripprefix-portainer,portainer-csp-headers@file"
       # HTTP service
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
     healthcheck:

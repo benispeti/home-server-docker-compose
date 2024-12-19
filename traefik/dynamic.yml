@@ -109,6 +109,9 @@ http:
     csp-headers:
       headers:
         contentSecurityPolicy: "default-src 'self' https:"
+    portainer-csp-headers:
+      headers:
+        contentSecurityPolicy: "default-src 'self' https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:;"
     plex-csp-headers:
       headers:
         contentSecurityPolicy: "default-src 'self' https:; script-src 'unsafe-inline' 'self' https://www.gstatic.com/; style-src 'unsafe-inline' 'self'; img-src 'self' data: blob: https://*.plex.tv https://*.plex.direct:*; connect-src 'self' https://*.plex.tv wss://*.plex.tv https://*.plex.direct:* wss://*.plex.direct:*; media-src 'self' data: blob:"
