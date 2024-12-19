@@ -3,6 +3,7 @@
 
 # ignore certificate files
 cert/*.key
+acme/*
 
 # ignore traefik credentials
 traefik/credentials.txt
@@ -14,3 +15,10 @@ home-assistant/*
 
 # ignore adguard files
 adguard/work/*
+
+# ignore node-red files
+node-red/*
+!node-red/Dockerfile
+
+# ignore sqlite browser files
+sqlitebrowser/*

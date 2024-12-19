@@ -1,5 +1,4 @@
 # Static configuration
-# traefik.yml
 
 global:
   sendAnonymousUsage: true
@@ -11,17 +10,63 @@ ping: {}
 api:
   insecure: true
   dashboard: true
+  # basePath: /traefik
   
 log:
   level: INFO
+accessLog:
+  addInternals: true
+  format: "json"
+  filters:
+    statusCodes:
+      - "400-599"
+    retryAttempts: true
+    minDuration: "10ms"
+  fields:
+    headers:
+      defaultMode: keep
 
 entryPoints:
   web:
     address: ":80"
+    # forwardedHeaders:
+    #   insecure: true
+    http:
+      middlewares:
+        - https-redirect@file
   websecure:
     address: ":443"
+    # forwardedHeaders:
+    #   insecure: true
     http:
-      tls: {}
+      tls:
+        options: modern@file
+        certresolver: letsencrypt
+      middlewares:
+        - modsecurity@file
+        - base@file
+        - security-headers@file
+  websecure2:
+    address: ":8443"
+    # forwardedHeaders:
+    #   insecure: true
+    http:
+      tls:
+        options: modern@file
+        certresolver: letsencrypt
+      middlewares:
+        - base@file
+        - security-headers@file
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      # staging server
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory
+      email: bpacmemail@gmail.com
+      storage: /acme/acme.json
+      tlsChallenge: {}
+      preferredChain: 'ISRG Root X1'
 
 # Docker configuration backend
 providers:
@@ -29,10 +74,18 @@ providers:
     defaultRule: "Host(`{{ trimPrefix `/` .Name }}.docker.localhost`)"
     exposedByDefault: false
     httpClientTimeout: 60
+    endpoint: tcp://socket-proxy:2375
   file: 
     filename: "/etc/traefik/dynamic.yml"
 
 tracing:
-  jaeger:
-    samplingServerURL: http://jaeger:5778/sampling
-    localAgentHostPort: jaeger:6831
+  otlp: {}
+
+experimental:
+  plugins:
+    plugin-rewritebody:
+      moduleName: "github.com/traefik/plugin-rewritebody"
+      version: "v0.3.1"
+    traefik-modsecurity-plugin:
+      moduleName: "github.com/madebymode/traefik-modsecurity-plugin"
+      version: "v1.6.0"

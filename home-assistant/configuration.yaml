@@ -17,24 +17,35 @@ http:
 tts:
   - platform: google_translate
 
+homeassistant:
+  customize: !include customize.yaml
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
 # Enable custom themes
 frontend:
   themes: !include_dir_merge_named themes
 
-panel_iframe:
-  traefik:
-    title: "Traefik"
-    url: !env_var TRAEFIK_URL
-    icon: mdi:router
-  adguard:
-    title: "AdGuard"
-    url: !env_var ADGUARD_URL
-    icon: mdi:advertisements-off
-  plex:
-    title: "Plex"
-    url: !env_var PLEX_URL
-    icon: mdi:plex
-  shelly:
-    title: "Shelly"
-    url: !env_var SHELLY_URL
-    icon: mdi:electric-switch
+config_editor:
+
+xiaomi_miot:
+  # https://github.com/al-one/hass-xiaomi-miot/blob/master/custom_components/xiaomi_miot/core/device_customizes.py
+  device_customizes:
+    viomi.vacuum.v8:
+      miot_local: true
+      chunk_properties: 10
+
+camera:
+  - platform: xiaomi_cloud_map_extractor
+    host: !secret xiaomi_vacuum_host
+    token: !secret xiaomi_vacuum_token
+    username: !secret xiaomi_cloud_username
+    password: !secret xiaomi_cloud_password
+    force_api: viomi
+    draw: ['all']
+    attributes:
+      - calibration_points
+    scan_interval:
+      seconds: 10

@@ -2,58 +2,119 @@
 # dynamic.yml
 
 tls:
-  stores:
-    default:
-      defaultCertificate:
-        certFile: /etc/traefik/certificates/traefik.crt
-        keyFile: /etc/traefik/certificates/traefik.key
-  certificates:
-    - certFile: /etc/traefik/certificates/traefik.crt
-      keyFile: /etc/traefik/certificates/traefik.key
-      stores:
-        - default
   options:
     modern:
-      minVersion: VersionTLS13
+      minVersion: VersionTLS12
+      cipherSuites:
+        - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
+        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+        - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 
 http:
   routers:
     shelly:
       entryPoints:
         - "websecure"
-      tls: true
-      rule: "Host(`{{env "SHELLY_DOMAIN"}}`)"
+      rule: "Host(`{{env "DOMAIN"}}`) && PathPrefix(`/{{env "SHELLY_PATH"}}`)"
       service: shelly
       middlewares:
-        - https-redirect@file
-        - additional-headers@file
-    deluge:
+        - cors-headers@file
+        - csp-headers@file
+    utorrent:
       entryPoints:
         - "websecure"
-      tls: true
-      rule: "Host(`{{env "DELUGE_DOMAIN"}}`)"
-      service: deluge
+      rule: "Host(`{{env "DOMAIN"}}`) && PathPrefix(`/{{env "UTORRENT_PATH"}}`)"
+      service: utorrent
       middlewares:
-        - https-redirect@file
-        - additional-headers@file
+        - cors-headers@file
+        - utorrent-csp-headers@file
+        - redirect-utorrent@file
+        - stripprefix-utorrent@file
   services:
     shelly:
       loadBalancer:
         servers:
-          - url: "http://{{env "SHELLY_IP"}}"
+          - url: 'http://{{env "SHELLY_IP"}}'
         passHostHeader: false
-    deluge:
+    utorrent:
       loadBalancer:
         servers:
-          - url: "http://{{env "DELUGE_IP"}}"
+          - url: 'http://{{env "UTORRENT_IP"}}'
         passHostHeader: true
   middlewares:
-    additional-headers:
-      headers:
-        contentTypeNosniff: true
-        contentSecurityPolicy: frame-src {{env "HOMEASSISTANT_DOMAIN"}}
-        stsIncludeSubdomains: true
-        stsSeconds: 63072000
     https-redirect:
       redirectscheme:
         scheme: https
+    response-compress:
+        compress: true
+    retry:
+      retry:
+        attempts: 3
+        initialinterval: 100ms
+    ratelimiting:
+      ratelimit:
+        average: 30
+        burst: 300
+        period: 1m
+    modsecurity:
+      plugin:
+        traefik-modsecurity-plugin:
+          BadRequestsThresholdCount: "25"
+          BadRequestsThresholdPeriodSecs: "600"
+          JailEnabled: "false"
+          JailTimeDurationSecs: "600"
+          ModsecurityUrl: http://modsec:8080
+          TimeoutMillis: "2000"
+    base:
+      chain:
+        middlewares:
+          # - modsecurity@file
+          - ratelimiting@file
+          - retry@file
+          - response-compress@file
+    security-headers:
+      headers:
+        addVaryHeader: true
+        browserXssFilter: true
+        contentTypeNosniff: true
+        frameDeny: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsSeconds: 63072000
+        permissionsPolicy: "microphone=(), geolocation=()"
+        referrerPolicy: "strict-origin"
+    cors-headers:
+      headers:
+        customResponseHeaders:
+          Access-Control-Allow-Origin: "https://{{env "DOMAIN"}}"
+          Access-Control-Max-Age: 600
+          Access-Control-Allow-Methods: "OPTIONS, HEAD, GET"
+    plex-cors-headers:
+      headers:
+        customResponseHeaders:
+          Access-Control-Allow-Origin: "*"
+          Access-Control-Max-Age: 600
+          Access-Control-Allow-Methods: "OPTIONS, HEAD, GET"
+    csp-headers:
+      headers:
+        contentSecurityPolicy: "default-src 'self' https:"
+    plex-csp-headers:
+      headers:
+        contentSecurityPolicy: "default-src 'self' https:; script-src 'unsafe-inline' 'self' https://www.gstatic.com/; style-src 'unsafe-inline' 'self'; img-src 'self' data: blob: https://*.plex.tv https://*.plex.direct:*; connect-src 'self' https://*.plex.tv wss://*.plex.tv https://*.plex.direct:* wss://*.plex.direct:*; media-src 'self' data: blob:"
+    ha-csp-headers:
+      headers:
+        contentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self';"
+    utorrent-csp-headers:
+      headers:
+        contentSecurityPolicy: "default-src 'self' https:; style-src 'unsafe-inline' 'self'"
+    stripprefix-utorrent:
+      stripprefix:
+        prefixes: /utorrent
+    redirect-utorrent:
+      redirectregex:
+        regex: ^{{env "UTORRENT_URL"}}/?$
+        replacement: {{env "UTORRENT_URL"}}/gui/
+        permanent: true
