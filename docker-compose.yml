@@ -47,11 +47,13 @@ services:
       # Middlewares
       # - "traefik.http.middlewares.stripprefix-plex.stripprefix.prefixes=/${PLEX_PATH}"
       # HTTP router
-      - "traefik.http.routers.plex_http.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${PLEX_PATH}`))"
+      # - "traefik.http.routers.plex_http.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${PLEX_PATH}`))"
+      - "traefik.http.routers.plex_http.rule=((Host(`plex.${DOMAIN}`) && PathPrefix(`/`)))"
       - "traefik.http.routers.plex_http.entrypoints=web"
       # HTTPS router
-      - "traefik.http.routers.plex_https.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${PLEX_PATH}`))"
-      - "traefik.http.routers.plex_https.entrypoints=websecure2"
+      # - "traefik.http.routers.plex_https.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${PLEX_PATH}`))"
+      - "traefik.http.routers.plex_https.rule=((Host(`plex.${DOMAIN}`) && PathPrefix(`/`)))"
+      - "traefik.http.routers.plex_https.entrypoints=websecure"
       - "traefik.http.routers.plex_https.middlewares=plex-cors-headers@file,plex-csp-headers@file"
       # HTTP service
       - "traefik.http.services.plex.loadbalancer.server.port=32400"
@@ -92,14 +94,16 @@ services:
     labels:
       - "traefik.enable=true"
       # Middlewares
-      - "traefik.http.middlewares.stripprefix-homeassistant.stripprefix.prefixes=/${HOMEASSISTANT_PATH}"
+      # - "traefik.http.middlewares.stripprefix-homeassistant.stripprefix.prefixes=/${HOMEASSISTANT_PATH}"
       # HTTP rule
-      - "traefik.http.routers.homeassistant_http.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${HOMEASSISTANT_PATH}`))"
+      # - "traefik.http.routers.homeassistant_http.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${HOMEASSISTANT_PATH}`))"
+      - "traefik.http.routers.homeassistant_http.rule=((Host(`homeassistant.${DOMAIN}`) && PathPrefix(`/`)))"
       - "traefik.http.routers.homeassistant_http.entrypoints=web"
       # HTTPS rule
-      - "traefik.http.routers.homeassistant_https.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${HOMEASSISTANT_PATH}`))"
+      # - "traefik.http.routers.homeassistant_https.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${HOMEASSISTANT_PATH}`))"
+      - "traefik.http.routers.homeassistant_https.rule=((Host(`homeassistant.${DOMAIN}`) && PathPrefix(`/`)))"
       - "traefik.http.routers.homeassistant_https.entrypoints=websecure"
-      - "traefik.http.routers.homeassistant_https.middlewares=cors-headers@file,ha-csp-headers@file,stripprefix-homeassistant"
+      - "traefik.http.routers.homeassistant_https.middlewares=modsecurity@file,cors-headers@file,ha-csp-headers@file"
       # HTTP service
       - "traefik.http.services.homeassistant.loadbalancer.server.port=8123"
     depends_on:
@@ -200,16 +204,18 @@ services:
       - "traefik.enable=true"
       # Middlewares
       - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_USERS}"
-      - "traefik.http.middlewares.stripprefix-dashboard.stripprefix.prefixes=/${TRAEFIK_PATH}"
+      # - "traefik.http.middlewares.stripprefix-dashboard.stripprefix.prefixes=/${TRAEFIK_PATH}"
       - "traefik.http.middlewares.traefik-ipallowlist.ipallowlist.sourcerange=192.168.0.0/22,172.20.0.1/24"
       # HTTPS config
-      - "traefik.http.routers.dashboard_https.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${TRAEFIK_PATH}`))"
+      # - "traefik.http.routers.dashboard_https.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${TRAEFIK_PATH}`))"
+      - "traefik.http.routers.dashboard_https.rule=((Host(`traefik.${DOMAIN}`) && PathPrefix(`/`)))"
       - "traefik.http.routers.dashboard_https.entrypoints=websecure"
       - "traefik.http.routers.dashboard_https.service=api@internal"
-      - "traefik.http.routers.dashboard_https.middlewares=traefik-auth,stripprefix-dashboard,traefik-ipallowlist"
+      - "traefik.http.routers.dashboard_https.middlewares=modsecurity@file,traefik-auth,traefik-ipallowlist"
 
       # HTTP config
-      - "traefik.http.routers.dashboard_http.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${TRAEFIK_PATH}`))"
+      # - "traefik.http.routers.dashboard_http.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${TRAEFIK_PATH}`))"
+      - "traefik.http.routers.dashboard_http.rule=((Host(`traefik.${DOMAIN}`) && PathPrefix(`/`)))"
       - "traefik.http.routers.dashboard_http.entrypoints=web"
       # HTTP service
       - "traefik.http.services.dashboard_https.loadbalancer.server.port=8080"
@@ -348,14 +354,16 @@ services:
     labels:
       - "traefik.enable=true"
       # Middlewares
-      - "traefik.http.middlewares.stripprefix-portainer.stripprefix.prefixes=/${PORTAINER_PATH}"
+      # - "traefik.http.middlewares.stripprefix-portainer.stripprefix.prefixes=/${PORTAINER_PATH}"
       # HTTP rule
-      - "traefik.http.routers.portainer_http.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${PORTAINER_PATH}`))"
+      # - "traefik.http.routers.portainer_http.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${PORTAINER_PATH}`))"
+      - "traefik.http.routers.portainer_http.rule=((Host(`portainer.${DOMAIN}`) && PathPrefix(`/`)))"
       - "traefik.http.routers.portainer_http.entrypoints=web"
       # HTTPS rule
-      - "traefik.http.routers.portainer_https.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${PORTAINER_PATH}`))"
+      # - "traefik.http.routers.portainer_https.rule=(Host(`${DOMAIN}`) && PathPrefix(`/${PORTAINER_PATH}`))"
+      - "traefik.http.routers.portainer_https.rule=((Host(`portainer.${DOMAIN}`) && PathPrefix(`/`)))"
       - "traefik.http.routers.portainer_https.entrypoints=websecure"
-      - "traefik.http.routers.portainer_https.middlewares=stripprefix-portainer,portainer-csp-headers@file"
+      - "traefik.http.routers.portainer_https.middlewares=modsecurity@file,portainer-csp-headers@file"
       # HTTP service
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
     healthcheck:

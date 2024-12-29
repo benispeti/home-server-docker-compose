@@ -21,7 +21,7 @@ accessLog:
     statusCodes:
       - "400-599"
     retryAttempts: true
-    minDuration: "10ms"
+    minDuration: "500ms"
   fields:
     headers:
       defaultMode: keep
@@ -43,20 +43,20 @@ entryPoints:
         options: modern@file
         certresolver: letsencrypt
       middlewares:
-        - modsecurity@file
+        # - modsecurity@file
         - base@file
         - security-headers@file
-  websecure2:
-    address: ":8443"
-    # forwardedHeaders:
-    #   insecure: true
-    http:
-      tls:
-        options: modern@file
-        certresolver: letsencrypt
-      middlewares:
-        - base@file
-        - security-headers@file
+  # websecure2:
+  #   address: ":8443"
+  #   # forwardedHeaders:
+  #   #   insecure: true
+  #   http:
+  #     tls:
+  #       options: modern@file
+  #       certresolver: letsencrypt
+  #     middlewares:
+  #       - base@file
+  #       - security-headers@file
 
 certificatesResolvers:
   letsencrypt:

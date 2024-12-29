@@ -26,7 +26,7 @@ http:
     shelly:
       entryPoints:
         - "websecure"
-      rule: "Host(`{{env "DOMAIN"}}`) && PathPrefix(`/{{env "SHELLY_PATH"}}`)"
+      rule: "Host(`shelly.{{env "DOMAIN"}}`) && PathPrefix(`/`)"
       service: shelly
       middlewares:
         - cors-headers@file
@@ -34,7 +34,7 @@ http:
     utorrent:
       entryPoints:
         - "websecure"
-      rule: "Host(`{{env "DOMAIN"}}`) && PathPrefix(`/{{env "UTORRENT_PATH"}}`)"
+      rule: "Host(`utorrent.{{env "DOMAIN"}}`) && PathPrefix(`/`)"
       service: utorrent
       middlewares:
         - cors-headers@file
@@ -117,7 +117,7 @@ http:
         contentSecurityPolicy: "default-src 'self' https:; script-src 'unsafe-inline' 'self' https://www.gstatic.com/; style-src 'unsafe-inline' 'self'; img-src 'self' data: blob: https://*.plex.tv https://*.plex.direct:*; connect-src 'self' https://*.plex.tv wss://*.plex.tv https://*.plex.direct:* wss://*.plex.direct:*; media-src 'self' data: blob:"
     ha-csp-headers:
       headers:
-        contentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self';"
+        contentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: https://brands.home-assistant.io/;"
     utorrent-csp-headers:
       headers:
         contentSecurityPolicy: "default-src 'self' https:; style-src 'unsafe-inline' 'self'"
